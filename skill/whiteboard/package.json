@@ -1,0 +1,8 @@
+{
+  "name": "whiteboard-skill",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Capture and read a Raspberry Pi whiteboard. discover.ts and capture.ts use only Node built-ins (no install needed). process.ts is optional and needs @anthropic-ai/sdk.",
+  "engines": { "node": ">=23.6" }
+}

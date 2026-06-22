@@ -1,0 +1,37 @@
+# Whiteboard server configuration.
+# install.sh writes the real file to /etc/whiteboard/whiteboard.conf from your
+# flags; this is a reference of every knob. Format is systemd EnvironmentFile
+# (KEY=value, no quotes needed, no inline comments).
+
+WHITEBOARD_PORT=8080
+
+# Human-friendly name shown during discovery. Defaults to the Pi hostname.
+WHITEBOARD_LABEL=Conference Room A
+
+# Shared secret. Leave empty for an open server on a trusted LAN. If set, every
+# request must send it via the X-Whiteboard-Token header or ?token= query param.
+# It is NEVER advertised over mDNS (only the fact that auth is required is).
+WHITEBOARD_TOKEN=
+
+# Capture resolution. Half-sensor on a Camera Module 3 (4608x2592) is plenty for
+# reading a whiteboard and keeps the JPEG small.
+WHITEBOARD_WIDTH=2304
+WHITEBOARD_HEIGHT=1296
+
+# How long rpicam-still runs before grabbing the frame, in milliseconds. Must be
+# >= the shutter time below. Bump to ~2000 when using a 1s exposure.
+WHITEBOARD_TIMEOUT=1200
+
+# Extra args appended to rpicam-still.
+#  - Autofocus Camera Module 3:            --autofocus-mode auto
+#  - Dark room, STATIC board + fixed cam:  use a long exposure + locked focus so
+#    you brighten without motion blur or noise, and avoid autofocus hunting in
+#    the dark (which can hang the capture):
+#      WHITEBOARD_EXTRA=--shutter 1000000 --gain 2 --awb auto --autofocus-mode manual --lens-position 1.0
+#    (--lens-position is in dioptres ~= 1/metres; 1.0 ~= 1m to the board.)
+# Leave empty for fixed-focus modules (the autofocus flags error on them).
+WHITEBOARD_EXTRA=
+
+# Lossless post-capture rotation via jpegtran: 90, 180, or 270 (empty = none).
+# rpicam-still only flips 0/180, so use this for a camera mounted sideways (90°).
+WHITEBOARD_ROTATE=

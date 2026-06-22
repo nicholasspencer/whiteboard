@@ -1,0 +1,14 @@
+#!/bin/sh
+# NetworkManager dispatcher script.
+# Fixes a boot race: avahi-daemon establishes static services (e.g.
+# _whiteboard._tcp) before wlan0 has an address, so it only binds them to `lo`
+# and never re-announces on Wi-Fi — mDNS service discovery then fails even
+# though the hostname resolves. Restarting avahi once the interface is up
+# re-publishes the service on the live interface.
+#
+# Installed to /etc/NetworkManager/dispatcher.d/ (root:root, mode 0755).
+IFACE="$1"
+ACTION="$2"
+if [ "$ACTION" = "up" ]; then
+    systemctl restart avahi-daemon || true
+fi
