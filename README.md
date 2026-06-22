@@ -101,43 +101,42 @@ is plenty — see the geometry notes in the build log if you want the math.
 
 Things that bit us getting the first unit live, documented so they don't bite again:
 
-1. **SD card lock switch.** A full-size SD card's write-protect slider makes the card
-   report `Media Read-Only: Yes`, and `dd` fails with **"Permission denied" even under
-   `sudo`** — looks exactly like a macOS permissions problem but isn't. Check the slider.
-2. **Raspberry Pi OS *Trixie* ignores a hand-dropped `/boot/firmware/custom.toml`.** The
+1. **Raspberry Pi OS *Trixie* ignores a hand-dropped `/boot/firmware/custom.toml`.** The
    hostname / Wi-Fi / SSH-key block silently didn't apply. The independent `ssh` and
    `userconf.txt` first-boot files *do* work. Use Raspberry Pi Imager's own customization,
    or configure Wi-Fi (`nmcli`) and hostname (`hostnamectl`) on the box after first boot.
-3. **Node `fetch` / `node:http` are unreliable on real LANs (macOS).** With a VPN
+2. **Node `fetch` / `node:http` are unreliable on real LANs (macOS).** With a VPN
    (Tailscale `utun`) and cloned/reject routes present, both throw `EHOSTUNREACH` for a
    host `curl` reaches fine, and undici doesn't use the OS mDNS resolver so `.local`
    names don't resolve. `capture.ts` therefore shells out to **`curl`**, and
    `discover.ts` to **`dns-sd`** — using the OS network stack, like everything else that
    worked.
-4. **mDNS service discovery fails on Wi-Fi after a reboot.** Avahi establishes static
+3. **mDNS service discovery fails on Wi-Fi after a reboot.** Avahi establishes static
    services at startup *before* `wlan0` has an address, binding them only to `lo`; the
    hostname still resolves but `_whiteboard._tcp` doesn't advertise on Wi-Fi. Fix: a
    NetworkManager dispatcher (`90-avahi-republish`) restarts Avahi whenever an interface
    comes up.
-5. **`rpicam-still --rotation` only does 0/180.** For a 90°-mounted camera, rotate the
+4. **`rpicam-still --rotation` only does 0/180.** For a 90°-mounted camera, rotate the
    JPEG afterward with `jpegtran -rotate` (lossless). The server does this when
    `WHITEBOARD_ROTATE` is set.
-6. **Autofocus hunts forever in the dark** and can hang a capture. For a static board on
+5. **Autofocus hunts forever in the dark** and can hang a capture. For a static board on
    a fixed mount, lock focus (`--autofocus-mode manual --lens-position`) and brighten
    with a long shutter instead.
-7. **Pi 4 Wi-Fi is 2.4/5 GHz only** — no 6 GHz. Joining a Wi-Fi 6E SSID just uses the
+6. **Pi 4 Wi-Fi is 2.4/5 GHz only** — no 6 GHz. Joining a Wi-Fi 6E SSID just uses the
    lower bands; make sure the network broadcasts one.
-8. **Secure the power cable.** Jostling USB-C while adjusting the camera browns out a
-   Pi 4 and reboots it (it auto-rejoins Wi-Fi, but you lose the session).
 
 ## Install the skill
 
+Claude Code loads skills from `~/.claude/skills/`. Clone the repo and link the skill
+there:
+
 ```bash
-gh skill publish ./skill/whiteboard     # publish to a gist
-gh skill add <gist-id>                   # install + link to Claude Code
+git clone https://github.com/nicholasspencer/whiteboard
+ln -s "$PWD/whiteboard/skill/whiteboard" ~/.claude/skills/whiteboard
 ```
 
-Or point Claude Code at `skill/whiteboard/` directly during development.
+It's then available as `/whiteboard`. (During development you can also point Claude
+Code straight at the `skill/whiteboard/` directory.)
 
 ## License
 
