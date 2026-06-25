@@ -1,0 +1,13 @@
+# Dart / Flutter build artifacts
+.dart_tool/
+.packages
+build/
+*.iml
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# CocoaPods / native ephemerals (Flutter app)
+**/Pods/
+**/.symlinks/
+**/Flutter/ephemeral/
+**/ephemeral/

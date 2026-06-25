@@ -1,0 +1,24 @@
+name: whiteboard_provisioner
+description: >-
+  Headless BLE peripheral for a whiteboard Raspberry Pi. Advertises a GATT
+  provisioning service over butane_bluez (BlueZ/D-Bus, no Flutter) and applies
+  Wi-Fi credentials with nmcli. Built on a Mac and cross-compiled to a
+  self-contained arm64 Linux binary — the Pi never installs Dart.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dependencies:
+  whiteboard_provisioning:
+    path: ../protocol
+  # butane's Linux peripheral implementation. Pulls in a `flutter` SDK dep that
+  # the actual code never imports, so it tree-shakes out of `dart compile exe`.
+  butane_bluez:
+    path: ../../../butane_flutter/packages/butane_bluez
+  butane_platform_interface:
+    path: ../../../butane_flutter/packages/butane_platform_interface
+
+dev_dependencies:
+  lints: ^3.0.0

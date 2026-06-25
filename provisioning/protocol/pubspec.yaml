@@ -1,0 +1,16 @@
+name: whiteboard_provisioning
+description: >-
+  Shared GATT contract for provisioning a whiteboard Raspberry Pi over BLE:
+  service/characteristic UUIDs, the command/status/info/network wire models, and
+  the chunk framing used to stream a Wi-Fi scan list past the BLE MTU. Pure Dart
+  (no Flutter) so both the Flutter app (central) and the headless Pi binary
+  (peripheral) can depend on it.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+dev_dependencies:
+  test: ^1.24.0
+  lints: ^3.0.0

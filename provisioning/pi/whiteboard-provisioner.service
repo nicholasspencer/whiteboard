@@ -1,0 +1,18 @@
+[Unit]
+Description=Whiteboard BLE Wi-Fi provisioner
+Documentation=https://github.com/nicholasspencer/whiteboard
+After=bluetooth.service dbus.service
+Wants=bluetooth.service
+
+[Service]
+Type=simple
+User=root
+# Optional: WHITEBOARD_LABEL is read from here if present (shared with the
+# capture server's config). The leading '-' tolerates the file being absent.
+EnvironmentFile=-/etc/whiteboard/whiteboard.conf
+ExecStart=/opt/whiteboard-provisioner/whiteboard-provisioner
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

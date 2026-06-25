@@ -1,0 +1,23 @@
+PODS:
+  - butane_core_bluetooth (0.0.1):
+    - Flutter
+    - FlutterMacOS
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - butane_core_bluetooth (from `.symlinks/plugins/butane_core_bluetooth/darwin`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  butane_core_bluetooth:
+    :path: ".symlinks/plugins/butane_core_bluetooth/darwin"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  butane_core_bluetooth: 20a0bd7033fed95a69de56e26a6298cd99ec2a94
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+
+PODFILE CHECKSUM: 3c63482e143d1b91d2d2560aee9fb04ecc74ac7e
+
+COCOAPODS: 1.16.2
