@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' hide ConnectionState;
 import 'package:whiteboard_provisioning/whiteboard_provisioning.dart';
 
 import '../device_controller.dart';
+import '../framing/framing_screen.dart';
 
 /// The setup screen for one rig: connection status, device info, a Wi-Fi
 /// network picker, and live provisioning progress.
@@ -75,6 +76,11 @@ class _DeviceScreenState extends State<DeviceScreen> {
         if (status != null) _StatusBanner(status: status),
         if (status != null) const SizedBox(height: 16),
         _InfoCard(info: _controller.info),
+        const SizedBox(height: 12),
+        _CameraCard(
+          ip: _controller.info?.ip,
+          onFrame: _openFraming,
+        ),
         const SizedBox(height: 24),
         Row(
           children: [
@@ -132,6 +138,20 @@ class _DeviceScreenState extends State<DeviceScreen> {
       ),
     );
     if (ok == true) await _controller.forget(ssid);
+  }
+
+  void _openFraming() {
+    final info = _controller.info;
+    final ip = info?.ip;
+    if (ip == null || ip.isEmpty) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => FramingScreen(
+          host: ip,
+          title: info?.label ?? _fallbackName,
+        ),
+      ),
+    );
   }
 }
 
@@ -247,6 +267,30 @@ class _InfoCard extends StatelessWidget {
           ),
           Expanded(child: Text(value)),
         ],
+      ),
+    );
+  }
+}
+
+class _CameraCard extends StatelessWidget {
+  const _CameraCard({required this.ip, required this.onFrame});
+
+  final String? ip;
+  final VoidCallback onFrame;
+
+  @override
+  Widget build(BuildContext context) {
+    final online = (ip ?? '').isNotEmpty;
+    return Card(
+      child: ListTile(
+        leading: const Icon(Icons.videocam_rounded),
+        title: const Text('Frame camera'),
+        subtitle: Text(online
+            ? 'Live preview to aim and rotate the camera'
+            : 'Connect the rig to Wi-Fi first'),
+        trailing: const Icon(Icons.chevron_right_rounded),
+        enabled: online,
+        onTap: online ? onFrame : null,
       ),
     );
   }

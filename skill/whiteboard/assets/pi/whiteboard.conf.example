@@ -22,16 +22,56 @@ WHITEBOARD_HEIGHT=1296
 # >= the shutter time below. Bump to ~2000 when using a 1s exposure.
 WHITEBOARD_TIMEOUT=1200
 
-# Extra args appended to rpicam-still.
-#  - Autofocus Camera Module 3:            --autofocus-mode auto
-#  - Dark room, STATIC board + fixed cam:  use a long exposure + locked focus so
-#    you brighten without motion blur or noise, and avoid autofocus hunting in
-#    the dark (which can hang the capture):
-#      WHITEBOARD_EXTRA=--shutter 1000000 --gain 2 --awb auto --autofocus-mode manual --lens-position 1.0
-#    (--lens-position is in dioptres ~= 1/metres; 1.0 ~= 1m to the board.)
+# Extra args appended to rpicam-still. With HDR on (below), do NOT set exposure
+# here — the bracket drives --shutter/--gain. Keep focus / white-balance here:
+#  - Autofocus Camera Module 3:   --autofocus-mode auto
+#  - Fixed cam, static board:     --autofocus-mode manual --lens-position 1.0 --awb auto
+#    (--lens-position is in dioptres ~= 1/metres; 1.0 ~= 1m to the board.) Locking
+#    focus avoids autofocus hunting in the dark, which can hang a capture.
 # Leave empty for fixed-focus modules (the autofocus flags error on them).
+# Non-HDR fallback for a dark room: a long exposure brightens without AF hunt, but
+# is brittle when the lighting changes — prefer HDR instead:
+#   WHITEBOARD_EXTRA=--shutter 1000000 --gain 2 --awb auto --autofocus-mode manual --lens-position 1.0
 WHITEBOARD_EXTRA=
 
 # Lossless post-capture rotation via jpegtran: 90, 180, or 270 (empty = none).
 # rpicam-still only flips 0/180, so use this for a camera mounted sideways (90°).
 WHITEBOARD_ROTATE=
+
+# HDR capture: shoot an exposure bracket and fuse it (Mertens, via `enfuse`) so
+# /capture stays readable across big lighting swings without recalibrating a fixed
+# exposure. "auto" = HDR when enfuse is installed, else a single shot; "on"/"off"
+# force it. The camera is fixed, so the bracket frames register perfectly.
+WHITEBOARD_HDR=auto
+# The bracket, as shutterMicros:gain stops. A wide EV span is what makes it robust
+# across bright<->dim; the server picks the well-exposed regions from each frame.
+WHITEBOARD_HDR_BRACKET=15000:1.0,150000:1.0,1000000:2.0
+
+# Change watcher: a background loop samples a tiny thumbnail and bumps a version
+# when the board settles into a changed state, exposed at GET /state. Consumers
+# poll /state cheaply and only do an expensive read when version advances. The
+# settle-gate (no frame-to-frame motion) holds off while someone is at the board.
+# 0 disables the watcher.
+WHITEBOARD_WATCH_INTERVAL=20000
+# Board-vs-committed mean diff to count as a change; and the frame-to-frame diff
+# below which the scene is "still". Tune per room — /state reports live lastDiff /
+# lastMotion so you can read off the actual noise floor.
+WHITEBOARD_WATCH_THRESHOLD=0.035
+WHITEBOARD_WATCH_STABLE_EPS=0.012
+
+# --- Live config + framing preview -----------------------------------------
+# Every capture knob above is ALSO editable at runtime via POST /config (the
+# setup app's framing screen). Edits are layered over these env defaults in a
+# JSON overrides file and applied on the next capture — no restart. Delete the
+# overrides file to fall back to these env values:
+WHITEBOARD_STATE_DIR=/var/lib/whiteboard
+# (the file is $WHITEBOARD_STATE_DIR/overrides.json, owned by the service user)
+
+# WebRTC live preview (MediaMTX). The app reads http://<rig>:<port>/<path>/whep
+# for a live framing view; it is only streamed while framing mode is on. The
+# capture server toggles the MediaMTX systemd unit on demand (via a scoped
+# NOPASSWD sudoers rule install.sh writes) so it never holds the camera except
+# while you're actively framing. These advertise the endpoint in GET /info:
+WHITEBOARD_WEBRTC_PORT=8889
+WHITEBOARD_WEBRTC_PATH=cam
+WHITEBOARD_MEDIAMTX_UNIT=mediamtx

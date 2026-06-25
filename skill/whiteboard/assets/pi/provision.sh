@@ -18,8 +18,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --host)  HOST="$2"; shift 2 ;;
     --user)  USER="$2"; shift 2 ;;
-    --label|--port|--token|--width|--height|--extra)
+    --label|--port|--token|--width|--height|--extra|--webrtc-port)
       INSTALL_ARGS+=("$1" "$2"); shift 2 ;;
+    --no-webrtc)
+      INSTALL_ARGS+=("$1"); shift ;;
     -h|--help)
       grep '^#' "$0" | sed 's/^# \{0,1\}//' | sed -n '2,9p'; exit 0 ;;
     *) echo "unknown option: $1" >&2; exit 2 ;;
@@ -37,6 +39,7 @@ TARGET="$USER@$HOST"
 echo "==> Copying server files to $TARGET:/tmp/whiteboard-install/"
 ssh "$TARGET" 'rm -rf /tmp/whiteboard-install && mkdir -p /tmp/whiteboard-install'
 scp -q "$SCRIPT_DIR/whiteboard-server.ts" "$SCRIPT_DIR/install.sh" "$SCRIPT_DIR/90-avahi-republish" \
+    "$SCRIPT_DIR/mediamtx.yml" \
     "$TARGET:/tmp/whiteboard-install/"
 
 echo "==> Running install.sh on the Pi (sudo)"

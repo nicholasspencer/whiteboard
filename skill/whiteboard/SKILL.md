@@ -89,3 +89,9 @@ needed), registers a systemd service, and advertises `_whiteboard._tcp`. Re-run
   autofocus — provision with `--extra "--autofocus-mode auto"` for sharper text.
 - All discovery and capture stays on the local network. Only `process.ts` (opt-in)
   sends the image off-device.
+- **Aiming the camera / changing settings later:** the server exposes a live
+  config (`GET`/`POST /config`) and a WebRTC live preview ("framing mode",
+  `POST /framing`) so the [setup app](../../provisioning/app) can show the camera
+  in real time and adjust rotation/focus/exposure without re-running `install.sh`.
+  The preview is served by MediaMTX, which the server only runs while you're
+  actively framing so it never competes with `/capture` for the camera.

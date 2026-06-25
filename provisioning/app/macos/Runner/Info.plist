@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Used to show your whiteboard rig's live camera and adjust its settings over your local network.</string>
 </dict>
 </plist>

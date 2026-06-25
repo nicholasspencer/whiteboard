@@ -6,6 +6,12 @@
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Used to find and set up your whiteboard rig's Wi-Fi over Bluetooth.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Used to show your whiteboard rig's live camera and adjust its settings over your local network.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>The live camera preview comes from your whiteboard rig over the network; this app does not use the device camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Required by the video framework for the rig's live preview; this app does not record audio.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

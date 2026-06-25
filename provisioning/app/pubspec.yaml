@@ -47,6 +47,8 @@ dependencies:
   # Shared GATT contract with the Pi peripheral.
   whiteboard_provisioning:
     path: ../protocol
+  flutter_webrtc: ^1.5.2
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

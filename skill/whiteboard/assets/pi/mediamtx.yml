@@ -1,0 +1,61 @@
+# MediaMTX configuration for the whiteboard live-framing preview.
+#
+# This streams the Raspberry Pi camera over WebRTC (WHEP) so the setup app can
+# show a live view while you aim and rotate the camera. It is read at
+#   http://<rig>:8889/cam/whep
+# Only WebRTC is enabled; RTSP/RTMP/HLS/SRT are off.
+#
+# The camera is a single-owner resource, so MediaMTX is NOT enabled at boot —
+# the whiteboard capture server starts it only for "framing mode" (and stops it
+# afterwards) so it never fights the still-capture path for the camera.
+#
+# Rotation is intentionally NOT applied here: the app rotates the preview
+# client-side from the same value that drives the still's jpegtran rotation, so
+# the live view and the saved photo stay consistent. See whiteboard-server.ts.
+#
+# NOTE: MediaMTX parses YAML 1.2, where yes/no are strings — booleans MUST be
+# written true/false.
+
+logLevel: info
+logDestinations: [stdout]
+
+# Turn off everything except WebRTC.
+rtsp: false
+rtmp: false
+hls: false
+srt: false
+api: false
+metrics: false
+pprof: false
+playback: false
+
+# WebRTC / WHEP.
+webrtc: true
+webrtcAddress: :8889
+# LAN-only: rely on host ICE candidates so there is no public STUN/TURN
+# round-trip (the office rig may have no outbound internet).
+webrtcICEServers2: []
+webrtcLocalUDPAddress: :8189
+
+# Anonymous read on a trusted LAN — mirrors the capture server's open posture.
+# (Set a user/pass here and pass it from the app if you ever want auth.)
+authInternalUsers:
+  - user: any
+    permissions:
+      - action: read
+      - action: publish
+
+paths:
+  cam:
+    source: rpiCamera
+    # FOV parity matters for framing. On the IMX708, 2304x1296 and 4608x2592 are
+    # full-sensor modes but 1536x864 is a center CROP — so we pin the full-FOV
+    # 2304x1296 sensor mode (matching the /capture default) and let the ISP scale
+    # to a 16:9 size the Pi 4's hardware H.264 encoder is happy with. What you
+    # frame is then the same field of view /capture saves.
+    rpiCameraMode: 2304:1296
+    rpiCameraWidth: 1280
+    rpiCameraHeight: 720
+    rpiCameraFPS: 30
+    # Lower IDR period → faster WebRTC keyframe on connect (quicker first frame).
+    rpiCameraIDRPeriod: 30

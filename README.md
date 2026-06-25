@@ -83,8 +83,14 @@ Short version:
 - **Sideways mount** (portrait board): mount the camera rotated 90° to fill the frame,
   then `--rotate 90` — the server losslessly rotates the JPEG (`rpicam-still` only does
   0/180).
-- **Dark room, static board**: use a long exposure with locked focus — bright, no blur,
-  no autofocus hunting:
+- **Changing light → HDR (recommended).** With `enfuse` installed (`install.sh` does
+  this), the server shoots an exposure bracket and fuses it, so `/capture` stays readable
+  across bright↔dim **without recalibrating** a fixed exposure. On by default when `enfuse`
+  is present (`WHITEBOARD_HDR=auto`). Keep exposure *out* of `--extra` and just lock focus:
+  `--extra "--awb auto --autofocus-mode manual --lens-position 1.0"`. The camera is fixed,
+  so the bracket frames register perfectly — fusion needs no alignment.
+- **Dark room, fixed exposure (non-HDR fallback)**: a long exposure with locked focus
+  brightens without blur or autofocus hunting, but is brittle if the lighting later changes:
   ```
   --extra "--shutter 1000000 --gain 2 --awb auto --autofocus-mode manual --lens-position 1.0" \
   --timeout 2000
